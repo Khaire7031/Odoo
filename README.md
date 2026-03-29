@@ -224,6 +224,20 @@ Odoo/
 
 ---
 
+## 📸 Screenshots
+
+### Login
+![Login](./assets/login.png)
+
+### Dashboard
+![Dashboard](./assets/dashboard.png)
+
+### Expense Submission
+![Expense](./assets/expense-form.png)
+
+### Approval Flow
+![Flow](./assets/flow.png)
+
 ## ⚙️ Setup Instructions
 
 ### 🗄️ Database (MySQL)
