@@ -269,36 +269,33 @@ const Expenses = () => {
                   {detailExpense.approvalSteps.map((step, i) => (
                     <div key={i} className="flex gap-3">
                       <div className="flex flex-col items-center">
-                        <div className={`h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                          step.status === "approved" ? "bg-green-500 text-white" :
+                        <div className={`h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${step.status === "approved" ? "bg-green-500 text-white" :
                           step.status === "rejected" ? "bg-red-500 text-white" :
-                          step.status === "pending" ? "bg-yellow-500 text-white animate-pulse" :
-                          step.status === "skipped" ? "bg-gray-300 text-gray-500" :
-                          "bg-muted text-muted-foreground"
-                        }`}>
+                            step.status === "pending" ? "bg-yellow-500 text-white animate-pulse" :
+                              step.status === "skipped" ? "bg-gray-300 text-gray-500" :
+                                "bg-muted text-muted-foreground"
+                          }`}>
                           {step.stepNumber}
                         </div>
                         {i < detailExpense.approvalSteps.length - 1 && (
-                          <div className={`w-0.5 h-8 ${
-                            step.status === "approved" ? "bg-green-300" :
+                          <div className={`w-0.5 h-8 ${step.status === "approved" ? "bg-green-300" :
                             step.status === "rejected" ? "bg-red-300" :
-                            "bg-muted"
-                          }`} />
+                              "bg-muted"
+                            }`} />
                         )}
                       </div>
                       <div className="pb-4">
                         <p className="text-sm font-medium">{step.approverRole} — {step.approverName}</p>
-                        <p className={`text-xs capitalize ${
-                          step.status === "approved" ? "text-green-600" :
+                        <p className={`text-xs capitalize ${step.status === "approved" ? "text-green-600" :
                           step.status === "rejected" ? "text-red-600" :
-                          step.status === "pending" ? "text-yellow-600" :
-                          "text-muted-foreground"
-                        }`}>
+                            step.status === "pending" ? "text-yellow-600" :
+                              "text-muted-foreground"
+                          }`}>
                           {step.status === "pending" ? "⏳ Awaiting action" :
-                           step.status === "waiting" ? "⏸ Waiting" :
-                           step.status === "skipped" ? "⏭ Skipped" :
-                           step.status === "approved" ? `✅ Approved${step.actionDate ? ` on ${step.actionDate}` : ""}` :
-                           `❌ Rejected${step.actionDate ? ` on ${step.actionDate}` : ""}`
+                            step.status === "waiting" ? "⏸ Waiting" :
+                              step.status === "skipped" ? "⏭ Skipped" :
+                                step.status === "approved" ? `✅ Approved${step.actionDate ? ` on ${step.actionDate}` : ""}` :
+                                  `❌ Rejected${step.actionDate ? ` on ${step.actionDate}` : ""}`
                           }
                         </p>
                         {step.comment && <p className="text-xs text-muted-foreground mt-0.5">"{step.comment}"</p>}
