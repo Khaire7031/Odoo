@@ -22,7 +22,7 @@ const roleBadge = (role: UserRole) => {
 const Admin = () => {
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", role: "employee" as UserRole, managerId: "" });
+  const [form, setForm] = useState({ name: "", email: "", role: "employee" as UserRole, managerId: "", password: "" });
   const { config, setApprovalSequence, setApprovalRule } = useCompany();
   const [sequence, setSequence] = useState<ApprovalSequenceStep[]>(config.approvalSequence);
   const [ruleType, setRuleType] = useState<ApprovalRuleType>(config.approvalRule.type);
@@ -76,6 +76,7 @@ const Admin = () => {
           email: form.email,
           role: form.role.toUpperCase(),
           managerId: form.managerId || null,
+          password: form.password || null,
         }),
       });
       if (!res.ok) {
@@ -85,7 +86,7 @@ const Admin = () => {
 
       fetchUsers();
       
-      setForm({ name: "", email: "", role: "employee", managerId: "" });
+      setForm({ name: "", email: "", role: "employee", managerId: "", password: "" });
       setOpen(false);
       toast({ title: "User Created", description: `${form.name} has been added as ${form.role}.` });
     } catch (err: any) {
@@ -169,6 +170,16 @@ const Admin = () => {
                     <SelectItem value="manager">Manager</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Password</Label>
+                <Input
+                  type="password"
+                  placeholder="Leave blank to use default (Welcome123!)"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                />
+                <p className="text-xs text-muted-foreground">If left empty, default password <strong>Welcome123!</strong> will be set.</p>
               </div>
               {form.role === "employee" && (
                 <div className="space-y-2">
