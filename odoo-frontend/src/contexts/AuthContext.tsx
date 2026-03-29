@@ -6,12 +6,13 @@ export interface AuthUser {
   email: string;
   name: string;
   role: UserRole;
+  userId?: string | null;
 }
 
 interface AuthContextType {
   isAuthenticated: boolean;
   user: AuthUser | null;
-  login: (email: string, token: string, role?: UserRole, name?: string) => void;
+  login: (email: string, token: string, userId: number, role?: UserRole, name?: string) => void;
   logout: () => void;
   isLoading: boolean;
   hasRole: (roles: UserRole[]) => boolean;
@@ -28,18 +29,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const email = localStorage.getItem("auth_email");
     const role = localStorage.getItem("auth_role") as UserRole | null;
     const name = localStorage.getItem("auth_name");
+    const userId = localStorage.getItem("userId");
+
     if (token && email) {
-      setUser({ email, role: role || "employee", name: name || email.split("@")[0] });
+      setUser({ email, role: role || "employee", name: name || email.split("@")[0], userId });
     }
     setIsLoading(false);
   }, []);
 
-  const login = useCallback((email: string, token: string, role: UserRole = "employee", name?: string) => {
+  const login = useCallback((email: string, token: string, userId: number, role: UserRole = "employee", name?: string) => {
     localStorage.setItem("auth_token", token);
     localStorage.setItem("auth_email", email);
     localStorage.setItem("auth_role", role);
     localStorage.setItem("auth_name", name || email.split("@")[0]);
-    setUser({ email, role, name: name || email.split("@")[0] });
+    if (userId) localStorage.setItem("userId", userId.toString());
+    setUser({ email, role, name: name || email.split("@")[0], userId: userId?.toString() || null });
   }, []);
 
   const logout = useCallback(() => {
@@ -47,6 +51,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("auth_email");
     localStorage.removeItem("auth_role");
     localStorage.removeItem("auth_name");
+    localStorage.removeItem("userId");
     setUser(null);
   }, []);
 

@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
-import { mockExpenses, type Expense, type ApprovalStep, type CompanyConfig } from "@/data/mockData";
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
+import { type Expense, type ApprovalStep, type CompanyConfig } from "@/data/mockData";
+import expenseService from "@/services/expenseService";
 
 interface ExpenseContextType {
   expenses: Expense[];
@@ -44,7 +45,13 @@ function evaluateApprovalRules(steps: ApprovalStep[], config: CompanyConfig, app
 }
 
 export const ExpenseProvider = ({ children }: { children: ReactNode }) => {
-  const [expenses, setExpenses] = useState<Expense[]>(mockExpenses);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+
+  useEffect(() => {
+    expenseService.getAll(123).then((mockExpenses) => {
+      setExpenses(mockExpenses);
+    });
+  }, []);
 
   const addExpense = useCallback((expense: Expense) => {
     setExpenses((prev) => [expense, ...prev]);
