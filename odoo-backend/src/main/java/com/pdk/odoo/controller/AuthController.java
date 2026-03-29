@@ -31,4 +31,9 @@ public class AuthController {
             return ResponseEntity.badRequest().body(java.util.Map.of("message", e.getMessage()));
         }
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+        return ResponseEntity.ok(java.util.Map.of("message", "Logged out successfully"));
+    }
 }

@@ -13,8 +13,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CompanyConfigService {
-
+    
     private final CompanyConfigRepository companyConfigRepository;
+    private final CompanyRepository companyRepository;
 
     @Transactional
     public CompanyConfigDto saveConfig(Long companyId, CompanyConfigDto dto) {
@@ -51,19 +52,30 @@ public class CompanyConfigService {
         }
 
         CompanyConfig saved = companyConfigRepository.save(config);
-        return mapToDto(saved);
+        Company company = companyRepository.findById(companyId).orElse(null);
+        return mapToDto(saved, company);
     }
 
     @Transactional(readOnly = true)
     public CompanyConfigDto getConfig(Long companyId) {
         CompanyConfig config = companyConfigRepository.findByCompanyId(companyId)
                 .orElse(null);
-        if (config == null) return new CompanyConfigDto();
-        return mapToDto(config);
+        Company company = companyRepository.findById(companyId).orElse(null);
+
+        if (config == null) {
+            return CompanyConfigDto.builder()
+                    .companyName(company != null ? company.getName() : null)
+                    .country(company != null ? company.getCountry() : null)
+                    .baseCurrency("USD")
+                    .build();
+        }
+        return mapToDto(config, company);
     }
 
-    public static CompanyConfigDto mapToDto(CompanyConfig config) {
+    public static CompanyConfigDto mapToDto(CompanyConfig config, Company company) {
         return CompanyConfigDto.builder()
+                .companyName(company != null ? company.getName() : null)
+                .country(company != null ? company.getCountry() : null)
                 .baseCurrency(config.getBaseCurrency() == null ? "USD" : config.getBaseCurrency())
                 .approvalRule(ApprovalRuleDto.builder()
                         .type(config.getApprovalRuleType() == null ? "percentage" : config.getApprovalRuleType())
