@@ -34,13 +34,14 @@ export const CompanyProvider = ({ children }: { children: ReactNode }) => {
       fetch(`http://localhost:8081/api/companies/${cid}/config`)
         .then((r) => r.json())
         .then((data) => {
-          if (data.approvalRule) {
-            setConfig((prev) => ({
-              ...prev,
-              baseCurrency: data.baseCurrency || prev.baseCurrency,
-              approvalRule: data.approvalRule,
+          if (data.approvalRule || data.companyName) {
+            setConfig({
+              companyName: data.companyName || "",
+              country: data.country || "",
+              baseCurrency: data.baseCurrency || "USD",
+              approvalRule: data.approvalRule || { type: "percentage", minPercentage: 67 },
               approvalSequence: data.approvalSequence || [],
-            }));
+            });
           }
         })
         .catch(console.error);
