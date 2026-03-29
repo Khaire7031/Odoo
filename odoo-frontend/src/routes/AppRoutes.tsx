@@ -1,28 +1,49 @@
-import { Routes, Route } from "react-router-dom";
-import MainLayout from "@/layouts/MainLayout";
+import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import Home from "@/pages/Home";
-import About from "@/pages/About";
+import DashboardLayout from "@/layouts/DashboardLayout";
 import Login from "@/pages/Login";
+import Signup from "@/pages/Signup";
 import Dashboard from "@/pages/Dashboard";
+import Expenses from "@/pages/Expenses";
+import Approvals from "@/pages/Approvals";
+import Admin from "@/pages/Admin";
 import NotFound from "@/pages/NotFound";
 
 const AppRoutes = () => (
   <Routes>
-    <Route element={<MainLayout />}>
-      <Route path="/" element={<Home />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/login" element={<Login />} />
+    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+    <Route path="/login" element={<Login />} />
+    <Route path="/signup" element={<Signup />} />
+
+    <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+      <Route path="/dashboard" element={<Dashboard />} />
       <Route
-        path="/dashboard"
+        path="/expenses"
         element={
-          <ProtectedRoute>
-            <Dashboard />
+          <ProtectedRoute allowedRoles={["admin", "employee"]}>
+            <Expenses />
           </ProtectedRoute>
         }
       />
-      <Route path="*" element={<NotFound />} />
+      <Route
+        path="/approvals"
+        element={
+          <ProtectedRoute allowedRoles={["admin", "manager"]}>
+            <Approvals />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <Admin />
+          </ProtectedRoute>
+        }
+      />
     </Route>
+
+    <Route path="*" element={<NotFound />} />
   </Routes>
 );
 

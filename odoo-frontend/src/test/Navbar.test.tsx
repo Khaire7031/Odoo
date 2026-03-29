@@ -16,7 +16,7 @@ const renderNavbar = () =>
 describe("Navbar", () => {
   it("renders the logo text", () => {
     renderNavbar();
-    expect(screen.getByText("Odoo")).toBeInTheDocument();
+    expect(screen.getByText("AppStarter")).toBeInTheDocument();
   });
 
   it("renders nav links", () => {

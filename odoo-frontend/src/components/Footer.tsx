@@ -8,7 +8,7 @@ const Footer = () => (
         <div>
           <div className="flex items-center gap-2 font-bold text-lg mb-3">
             <Zap className="h-5 w-5 text-primary" />
-            <span>Odoo</span>
+            <span>AppStarter</span>
           </div>
           <p className="text-sm text-muted-foreground max-w-xs">
             A modern, production-ready React starter template built for speed and scalability.
@@ -30,11 +30,11 @@ const Footer = () => (
         </div>
         <div>
           <h4 className="font-semibold text-sm mb-3">Contact</h4>
-          <p className="text-sm text-muted-foreground">hello@Odoo.dev</p>
+          <p className="text-sm text-muted-foreground">hello@appstarter.dev</p>
         </div>
       </div>
       <div className="mt-8 pt-6 border-t border-border text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Odoo. All rights reserved.
+        © {new Date().getFullYear()} AppStarter. All rights reserved.
       </div>
     </div>
   </footer>

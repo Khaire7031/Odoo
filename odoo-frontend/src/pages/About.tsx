@@ -1,10 +1,10 @@
 const About = () => (
   <div className="pt-24 pb-16">
     <div className="container max-w-2xl">
-      <h1 className="text-3xl md:text-4xl font-bold mb-6 animate-fade-in">About Odoo</h1>
+      <h1 className="text-3xl md:text-4xl font-bold mb-6 animate-fade-in">About AppStarter</h1>
       <div className="space-y-4 text-muted-foreground animate-slide-up">
         <p>
-          Odoo is a modern, production-ready React boilerplate designed for hackathons and rapid prototyping.
+          AppStarter is a modern, production-ready React boilerplate designed for hackathons and rapid prototyping.
         </p>
         <p>
           It comes with a clean folder structure, authentication flow, centralized API layer with Axios,

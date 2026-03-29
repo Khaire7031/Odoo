@@ -4,6 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { CompanyProvider } from "@/contexts/CompanyContext";
+import { ExpenseProvider } from "@/contexts/ExpenseContext";
 import AppRoutes from "@/routes/AppRoutes";
 
 const queryClient = new QueryClient();
@@ -14,9 +16,13 @@ const App = () => (
       <Toaster />
       <Sonner />
       <AuthProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
+        <CompanyProvider>
+          <ExpenseProvider>
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
+          </ExpenseProvider>
+        </CompanyProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
