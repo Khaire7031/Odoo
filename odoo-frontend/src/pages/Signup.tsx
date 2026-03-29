@@ -84,8 +84,8 @@ const Signup = () => {
       if (!res.ok) throw new Error(data.message || "Signup failed");
 
       setCompanyInfo(company, selectedCountry, detectedCurrency);
-      localStorage.setItem("companyId", data.companyId); // Save globally accessible metadata
-      login(email, "demo-token-" + String(Date.now()), data.adminUserId, "admin", name);
+      localStorage.setItem("companyId", data.companyId);
+      login(email, data.token || "", data.adminUserId, "admin", name);
       navigate("/dashboard");
     } catch (err: any) {
       setErrors({ general: err.message || "Signup failed." });

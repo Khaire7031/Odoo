@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { mockUsers, type UserRecord, type ApprovalSequenceStep, type ApprovalRuleType } from "@/data/mockData";
+import { type UserRecord, type ApprovalSequenceStep, type ApprovalRuleType } from "@/data/types";
 import { useCompany } from "@/contexts/CompanyContext";
 import type { UserRole } from "@/contexts/AuthContext";
 import { UserPlus, Users, Shield, Settings2, ArrowUp, ArrowDown, Trash2, Plus, Info, Zap } from "lucide-react";
@@ -20,7 +20,7 @@ const roleBadge = (role: UserRole) => {
 };
 
 const Admin = () => {
-  const [users, setUsers] = useState<UserRecord[]>(mockUsers);
+  const [users, setUsers] = useState<UserRecord[]>([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", role: "employee" as UserRole, managerId: "" });
   const { config, setApprovalSequence, setApprovalRule } = useCompany();
@@ -34,7 +34,20 @@ const Admin = () => {
 
   const [managers, setManagers] = useState<{ id: string | number; name: string }[]>([]);
 
+  const fetchUsers = () => {
+    const companyId = localStorage.getItem("companyId");
+    if (companyId) {
+      fetch(`http://localhost:8081/api/admin/companies/${companyId}/users/all`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (Array.isArray(data)) setUsers(data);
+        })
+        .catch(console.error);
+    }
+  };
+
   useEffect(() => {
+    fetchUsers();
     const companyId = localStorage.getItem("companyId");
     if (companyId) {
       fetch(`http://localhost:8081/api/admin/companies/${companyId}/managers`)
@@ -70,17 +83,11 @@ const Admin = () => {
         throw new Error(errorData.message || "Failed to create user");
       }
 
-      const manager = managers.find((m) => m.id === form.managerId);
-      const newUser: UserRecord = {
-        id: `USR-${String(users.length + 1).padStart(3, "0")}`,
-        name: form.name, email: form.email, role: form.role,
-        managerId: form.managerId || undefined, managerName: manager?.name,
-        createdAt: new Date().toISOString().split("T")[0],
-      };
-      setUsers([...users, newUser]);
+      fetchUsers();
+      
       setForm({ name: "", email: "", role: "employee", managerId: "" });
       setOpen(false);
-      toast({ title: "User Created", description: `${newUser.name} has been added as ${newUser.role}.` });
+      toast({ title: "User Created", description: `${form.name} has been added as ${form.role}.` });
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     }
@@ -180,7 +187,6 @@ const Admin = () => {
         </Dialog>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { label: "Total Users", value: users.length, icon: Users },
@@ -204,7 +210,6 @@ const Admin = () => {
           <TabsTrigger value="rules">Approval Rules</TabsTrigger>
         </TabsList>
 
-        {/* Users Tab */}
         <TabsContent value="users">
           <Card>
             <CardHeader><CardTitle className="text-lg">All Users</CardTitle></CardHeader>
@@ -237,7 +242,6 @@ const Admin = () => {
           </Card>
         </TabsContent>
 
-        {/* Approval Sequence Tab */}
         <TabsContent value="sequence">
           <Card>
             <CardHeader>
@@ -274,7 +278,6 @@ const Admin = () => {
                 </div>
               )}
 
-              {/* Add Step */}
               <div className="flex gap-2 items-end">
                 <div className="space-y-1 flex-1">
                   <Label className="text-xs">Role Label</Label>
@@ -299,7 +302,6 @@ const Admin = () => {
           </Card>
         </TabsContent>
 
-        {/* Approval Rules Tab */}
         <TabsContent value="rules">
           <Card>
             <CardHeader>
@@ -319,7 +321,6 @@ const Admin = () => {
                 </Select>
               </div>
 
-              {/* Explanation */}
               <div className="bg-muted/50 rounded-lg p-3 text-xs space-y-2">
                 <div className="flex items-start gap-2">
                   <Info className="h-3.5 w-3.5 mt-0.5 shrink-0 text-primary" />

@@ -39,7 +39,6 @@ const Navbar = () => {
           <span className={scrolled ? "text-foreground" : "text-primary-foreground"}>AppStarter</span>
         </Link>
 
-        {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
             <Link
@@ -63,7 +62,6 @@ const Navbar = () => {
           )}
         </nav>
 
-        {/* Mobile toggle */}
         <button
           className="md:hidden p-2"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -73,7 +71,6 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile menu */}
       {menuOpen && (
         <div className="md:hidden bg-background border-b border-border animate-fade-in">
           <nav className="container flex flex-col gap-2 py-4">

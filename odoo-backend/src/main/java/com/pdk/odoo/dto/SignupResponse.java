@@ -13,4 +13,5 @@ public class SignupResponse {
     private String message;
     private Long companyId;
     private Long adminUserId;
+    private String token;
 }

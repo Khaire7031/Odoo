@@ -1,105 +1,89 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
-import { type Expense, type ApprovalStep, type CompanyConfig } from "@/data/mockData";
-import expenseService from "@/services/expenseService";
+import { type Expense, type ApprovalStep, type CompanyConfig } from "@/data/types";
 
 interface ExpenseContextType {
   expenses: Expense[];
   addExpense: (expense: Expense) => void;
   processApproval: (expenseId: string, approverId: string, action: "approve" | "reject", comment: string, config: CompanyConfig) => void;
+  deleteExpense: (expenseId: string, rawId?: number) => void;
 }
 
 const ExpenseContext = createContext<ExpenseContextType | undefined>(undefined);
 
-function evaluateApprovalRules(steps: ApprovalStep[], config: CompanyConfig, approverId: string): { autoApprove: boolean; reason: string } {
-  const rule = config.approvalRule;
-  const approvedCount = steps.filter((s) => s.status === "approved").length;
-  const totalSteps = steps.length;
-  const pct = totalSteps > 0 ? (approvedCount / totalSteps) * 100 : 0;
-
-  if (rule.type === "percentage" && rule.minPercentage) {
-    if (pct >= rule.minPercentage) {
-      return { autoApprove: true, reason: `Auto-approved: ${Math.round(pct)}% approval threshold reached (${approvedCount}/${totalSteps} approvers)` };
-    }
-  }
-
-  if (rule.type === "specific_approver" && rule.specificApproverId) {
-    const specificStep = steps.find((s) => s.approverId === rule.specificApproverId);
-    if (specificStep?.status === "approved") {
-      return { autoApprove: true, reason: `Auto-approved: ${rule.specificApproverName || "Specific approver"} approved` };
-    }
-  }
-
-  if (rule.type === "hybrid") {
-    if (rule.minPercentage && pct >= rule.minPercentage) {
-      return { autoApprove: true, reason: `Auto-approved: ${Math.round(pct)}% approval threshold reached (${approvedCount}/${totalSteps} approvers)` };
-    }
-    if (rule.specificApproverId) {
-      const specificStep = steps.find((s) => s.approverId === rule.specificApproverId);
-      if (specificStep?.status === "approved") {
-        return { autoApprove: true, reason: `Auto-approved: ${rule.specificApproverName || "Specific approver"} approved` };
-      }
-    }
-  }
-
-  return { autoApprove: false, reason: "" };
-}
-
 export const ExpenseProvider = ({ children }: { children: ReactNode }) => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
 
+  const fetchExpenses = useCallback(async () => {
+    const userId = localStorage.getItem("userId");
+    const companyId = localStorage.getItem("companyId");
+    const role = localStorage.getItem("auth_role");
+    
+    if (!userId || !companyId || !role) return;
+    
+    const url = role === "admin" || role === "manager" 
+      ? `http://localhost:8081/api/expenses/company?companyId=${companyId}`
+      : `http://localhost:8081/api/expenses/my?userId=${userId}`;
+      
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      setExpenses(data);
+    } catch(e) {
+      console.error(e);
+    }
+  }, []);
+
   useEffect(() => {
-    expenseService.getAll(123).then((mockExpenses) => {
-      setExpenses(mockExpenses);
-    });
-  }, []);
+    fetchExpenses();
+  }, [fetchExpenses]);
 
-  const addExpense = useCallback((expense: Expense) => {
-    setExpenses((prev) => [expense, ...prev]);
-  }, []);
+  const addExpense = useCallback(async (expense: Expense) => {
+    const userId = localStorage.getItem("userId");
+    try {
+      await fetch("http://localhost:8081/api/expenses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: userId,
+          amount: expense.amount,
+          currency: expense.currency,
+          convertedAmount: expense.convertedAmount,
+          baseCurrency: expense.baseCurrency,
+          category: expense.category,
+          description: expense.description,
+          date: expense.date
+        })
+      });
+      fetchExpenses();
+    } catch(e) { console.error(e) }
+  }, [fetchExpenses]);
 
-  const processApproval = useCallback((expenseId: string, approverId: string, action: "approve" | "reject", comment: string, config: CompanyConfig) => {
-    setExpenses((prev) =>
-      prev.map((exp) => {
-        if (exp.id !== expenseId) return exp;
+  const deleteExpense = useCallback(async (expenseId: string, rawId?: number) => {
+    try {
+      await fetch(`http://localhost:8081/api/expenses/${rawId || expenseId}`, {
+        method: "DELETE",
+      });
+      fetchExpenses();
+    } catch(e) { console.error(e); }
+  }, [fetchExpenses]);
 
-        const updatedSteps = exp.approvalSteps.map((step) => {
-          if (step.approverId === approverId && step.status === "pending") {
-            return { ...step, status: action === "approve" ? "approved" as const : "rejected" as const, comment: comment || undefined, actionDate: new Date().toISOString().split("T")[0] };
-          }
-          return step;
-        });
-
-        if (action === "reject") {
-          // Mark all subsequent waiting steps as skipped
-          const rejectedIdx = updatedSteps.findIndex((s) => s.approverId === approverId);
-          const finalSteps = updatedSteps.map((s, i) => i > rejectedIdx && s.status === "waiting" ? { ...s, status: "skipped" as const } : s);
-          return { ...exp, status: "rejected" as const, approvalSteps: finalSteps };
-        }
-
-        // Check auto-approval rules
-        const { autoApprove, reason } = evaluateApprovalRules(updatedSteps, config, approverId);
-
-        if (autoApprove) {
-          const finalSteps = updatedSteps.map((s) => s.status === "waiting" ? { ...s, status: "skipped" as const } : s);
-          return { ...exp, status: "auto_approved" as const, approvalSteps: finalSteps, autoApproveReason: reason };
-        }
-
-        // Activate next waiting step
-        const nextWaiting = updatedSteps.findIndex((s) => s.status === "waiting");
-        if (nextWaiting !== -1) {
-          updatedSteps[nextWaiting] = { ...updatedSteps[nextWaiting], status: "pending" };
-          return { ...exp, approvalSteps: updatedSteps };
-        }
-
-        // All steps done
-        const allApproved = updatedSteps.every((s) => s.status === "approved" || s.status === "skipped");
-        return { ...exp, status: allApproved ? "approved" as const : "rejected" as const, approvalSteps: updatedSteps };
-      })
-    );
-  }, []);
+  const processApproval = useCallback(async (expenseId: string, approverId: string, action: "approve" | "reject", comment: string, config: CompanyConfig) => {
+    const exp = expenses.find(e => e.id === expenseId);
+    const authApproverId = localStorage.getItem("userId") || approverId;
+    if (!exp) return;
+     
+    try {
+       await fetch(`http://localhost:8081/api/approvals/${exp.rawId || expenseId}/action`, {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({ action, comment, approverId: Number(authApproverId) })
+       });
+       fetchExpenses();
+    } catch(e) { console.error(e); }
+  }, [expenses, fetchExpenses]);
 
   return (
-    <ExpenseContext.Provider value={{ expenses, addExpense, processApproval }}>
+    <ExpenseContext.Provider value={{ expenses, addExpense, processApproval, deleteExpense }}>
       {children}
     </ExpenseContext.Provider>
   );

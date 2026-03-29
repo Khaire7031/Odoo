@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8081/";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -8,7 +8,6 @@ const apiClient = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// Request interceptor - attach auth token
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("auth_token");
@@ -20,7 +19,6 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor - handle errors globally
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {

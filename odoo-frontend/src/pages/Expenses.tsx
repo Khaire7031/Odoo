@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import StatusBadge from "@/components/StatusBadge";
 import { useExpenses } from "@/contexts/ExpenseContext";
 import { useCompany } from "@/contexts/CompanyContext";
-import { expenseCategories, currencies, type Expense, type ApprovalStep } from "@/data/mockData";
+import { expenseCategories, currencies, type Expense } from "@/data/types";
 import { Plus, Upload, Receipt, ArrowRight, RefreshCw, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -26,9 +26,7 @@ const Expenses = () => {
   const [detailExpense, setDetailExpense] = useState<Expense | null>(null);
   const { toast } = useToast();
 
-  const myExpenses = user?.role === "employee"
-    ? expenses.filter((e) => e.employeeEmail === user.email)
-    : expenses;
+  const myExpenses = expenses;
 
   const fetchConversion = async (amount: string, fromCurrency: string) => {
     if (!amount || !fromCurrency || fromCurrency === config.baseCurrency) {
@@ -65,18 +63,10 @@ const Expenses = () => {
       return;
     }
 
-    const approvalSteps: ApprovalStep[] = config.approvalSequence.map((seq, idx) => ({
-      stepNumber: seq.stepNumber,
-      approverRole: seq.role,
-      approverName: seq.approverName,
-      approverId: seq.approverId,
-      status: idx === 0 ? "pending" : "waiting",
-    }));
-
     const newExpense: Expense = {
-      id: `EXP-${String(Date.now()).slice(-5)}`,
+      id: "pending",
       employeeName: user?.name || "You",
-      employeeEmail: user?.email || "you@company.com",
+      employeeEmail: user?.email || "",
       amount: parseFloat(form.amount),
       currency: form.currency,
       convertedAmount: convertedAmount ?? undefined,
@@ -85,13 +75,13 @@ const Expenses = () => {
       description: form.description,
       date: form.date,
       status: "waiting",
-      approvalSteps,
+      approvalSteps: [],
     };
     addExpense(newExpense);
     setForm({ amount: "", currency: config.baseCurrency, category: "", description: "", date: "" });
     setConvertedAmount(null);
     setOpen(false);
-    toast({ title: "Expense Submitted", description: `${newExpense.id} is now waiting for approval.` });
+    toast({ title: "Expense Submitted", description: "Your expense is now waiting for approval." });
   };
 
   return (
@@ -173,7 +163,6 @@ const Expenses = () => {
                 </div>
               </div>
 
-              {/* Approval Preview */}
               <div className="bg-muted/50 rounded-lg p-3">
                 <p className="text-xs font-medium text-muted-foreground mb-2">Approval Flow Preview</p>
                 <div className="flex items-center gap-1 flex-wrap text-xs">
@@ -195,7 +184,6 @@ const Expenses = () => {
         </Dialog>
       </div>
 
-      {/* Expense Table */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg"><Receipt className="h-5 w-5" /> Expense History</CardTitle>
@@ -235,7 +223,6 @@ const Expenses = () => {
         </CardContent>
       </Card>
 
-      {/* Detail Modal with Timeline */}
       <Dialog open={!!detailExpense} onOpenChange={(o) => !o && setDetailExpense(null)}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
@@ -262,7 +249,6 @@ const Expenses = () => {
                 </div>
               )}
 
-              {/* Approval Timeline */}
               <div>
                 <p className="text-sm font-medium mb-3">Approval Timeline</p>
                 <div className="space-y-0">

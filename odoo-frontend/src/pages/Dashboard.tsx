@@ -15,6 +15,8 @@ const Dashboard = () => {
   const approved = expenses.filter((e) => e.status === "approved" || e.status === "auto_approved");
   const rejected = expenses.filter((e) => e.status === "rejected");
 
+  const uniqueCategories = [...new Set(expenses.map((e) => e.category))];
+
   const stats = [
     { label: "Total Expenses", value: `${config.baseCurrency} ${totalExpenses.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, icon: DollarSign, color: "text-primary" },
     { label: "Waiting Approval", value: waiting.length.toString(), icon: Clock, color: "text-yellow-600" },
@@ -31,7 +33,6 @@ const Dashboard = () => {
         </p>
       </div>
 
-      {/* Company Info */}
       <Card className="bg-primary/5 border-primary/20">
         <CardContent className="py-3 flex items-center gap-4 flex-wrap text-sm">
           <span className="flex items-center gap-1.5 font-medium"><Globe className="h-4 w-4 text-primary" />{config.companyName}</span>
@@ -59,7 +60,6 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* Recent Expenses */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg"><Receipt className="h-5 w-5" /> Recent Expenses</CardTitle>
@@ -82,14 +82,13 @@ const Dashboard = () => {
         </CardContent>
       </Card>
 
-      {/* Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg"><TrendingUp className="h-5 w-5" /> Spending by Category</CardTitle>
           </CardHeader>
           <CardContent>
-            {["Travel", "Meals", "Equipment", "Software", "Office Supplies"].map((cat) => {
+            {uniqueCategories.map((cat) => {
               const catTotal = expenses.filter((e) => e.category === cat).reduce((s, e) => s + e.amount, 0);
               const pct = totalExpenses > 0 ? (catTotal / totalExpenses) * 100 : 0;
               return (

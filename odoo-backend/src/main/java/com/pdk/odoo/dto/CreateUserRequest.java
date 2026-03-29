@@ -6,7 +6,7 @@ import lombok.Data;
 public class CreateUserRequest {
     private String fullName;
     private String email;
-    private String role; // "EMPLOYEE" or "MANAGER"
-    private Long managerId; // for employees only
-    private String password; // optional, can default if null
+    private String role;
+    private Long managerId;
+    private String password;
 }

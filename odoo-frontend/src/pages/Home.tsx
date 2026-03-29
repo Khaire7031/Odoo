@@ -22,7 +22,6 @@ const features = [
 
 const Home = () => (
   <div>
-    {/* Hero */}
     <section className="hero-gradient relative overflow-hidden">
       <div className="container relative z-10 flex flex-col items-center justify-center text-center py-32 md:py-44 gap-6">
         <h1 className="text-4xl md:text-6xl font-bold text-primary-foreground animate-slide-up max-w-3xl leading-tight">
@@ -42,12 +41,10 @@ const Home = () => (
           </Button>
         </div>
       </div>
-      {/* decorative circles */}
       <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary-foreground/5 rounded-full" />
       <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] bg-primary-foreground/5 rounded-full" />
     </section>
 
-    {/* Features */}
     <section className="container py-20 md:py-28">
       <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">Everything You Need</h2>
       <div className="grid md:grid-cols-3 gap-6">

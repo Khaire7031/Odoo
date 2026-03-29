@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import StatusBadge from "@/components/StatusBadge";
 import { useExpenses } from "@/contexts/ExpenseContext";
 import { useCompany } from "@/contexts/CompanyContext";
-import { type Expense } from "@/data/mockData";
+import { type Expense } from "@/data/types";
 import { CheckCircle, XCircle, MessageSquare, ArrowRight, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -21,13 +21,12 @@ const Approvals = () => {
   const [detailExpense, setDetailExpense] = useState<Expense | null>(null);
   const { toast } = useToast();
 
-  // Show expenses that are waiting and have a pending step
+  const currentUserId = Number(localStorage.getItem("userId"));
   const pendingExpenses = expenses.filter((e) =>
-    e.status === "waiting" && e.approvalSteps.some((s) => s.status === "pending")
+    e.status === "waiting" && e.approvalSteps.some((s) => s.status === "pending" && Number(s.approverId) === currentUserId)
   );
 
   const handleAction = () => {
-    // Find the current pending approver for this expense
     const exp = expenses.find((e) => e.id === commentModal.expenseId);
     const pendingStep = exp?.approvalSteps.find((s) => s.status === "pending");
     if (!pendingStep) return;
@@ -54,7 +53,6 @@ const Approvals = () => {
         <p className="text-muted-foreground">Review and manage expense requests through the approval flow</p>
       </div>
 
-      {/* Approval Flow Overview */}
       <Card>
         <CardContent className="py-4">
           <p className="text-xs font-medium text-muted-foreground mb-3">Company Approval Sequence</p>
@@ -75,7 +73,6 @@ const Approvals = () => {
             <span className="text-green-600 font-medium">✅ Done</span>
           </div>
 
-          {/* Rule explanation */}
           <div className="mt-3 bg-muted/50 rounded-lg p-3 text-xs text-muted-foreground flex items-start gap-2">
             <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
             <div>
@@ -88,7 +85,6 @@ const Approvals = () => {
         </CardContent>
       </Card>
 
-      {/* Pending Requests */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">
@@ -111,7 +107,7 @@ const Approvals = () => {
                   <TableHead>Amount</TableHead>
                   <TableHead>Current Step</TableHead>
                   <TableHead>Progress</TableHead>
-                  {/* <TableHead className="text-right">Actions</TableHead> */}
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -147,7 +143,7 @@ const Approvals = () => {
                         </div>
                         <p className="text-xs text-muted-foreground mt-0.5">{completedSteps}/{exp.approvalSteps.length}</p>
                       </TableCell>
-                      {/* <TableCell className="text-right">
+                      <TableCell className="text-right">
                         <div className="flex gap-1 justify-end">
                           <Button size="sm" variant="outline" className="text-green-600 border-green-200 hover:bg-green-50" onClick={() => openModal(exp.id, "approve")}>
                             <CheckCircle className="h-3 w-3 mr-1" /> Approve
@@ -156,7 +152,7 @@ const Approvals = () => {
                             <XCircle className="h-3 w-3 mr-1" /> Reject
                           </Button>
                         </div>
-                      </TableCell> */}
+                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -166,7 +162,6 @@ const Approvals = () => {
         </CardContent>
       </Card>
 
-      {/* All Expenses */}
       <Card>
         <CardHeader><CardTitle className="text-lg">All Expenses</CardTitle></CardHeader>
         <CardContent>
@@ -199,7 +194,6 @@ const Approvals = () => {
         </CardContent>
       </Card>
 
-      {/* Detail Modal with Timeline */}
       <Dialog open={!!detailExpense} onOpenChange={(o) => !o && setDetailExpense(null)}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
@@ -267,7 +261,6 @@ const Approvals = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Comment Modal */}
       <Dialog open={commentModal.open} onOpenChange={(o) => setCommentModal({ ...commentModal, open: o })}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

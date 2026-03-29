@@ -45,7 +45,6 @@ public class DataLoaderConfig {
 
                             if (!currenciesNode.isMissingNode() && !currenciesNode.isEmpty()) {
                                 Iterator<Map.Entry<String, JsonNode>> fields = currenciesNode.properties().iterator();
-                                // Create an entry for each currency if a country has multiple
                                 while (fields.hasNext()) {
                                     Map.Entry<String, JsonNode> entry = fields.next();
                                     String code = entry.getKey();
@@ -62,7 +61,6 @@ public class DataLoaderConfig {
                                             .build());
                                 }
                             } else {
-                                // For countries without currency data
                                 countries.add(Country.builder()
                                         .name(countryName)
                                         .build());

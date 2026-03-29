@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +55,7 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.ADMIN)
                 .companyId(company.getId())
+                .createdAt(new Date())
                 .build();
 
         adminUser = userRepository.save(adminUser);
@@ -62,6 +64,7 @@ public class AuthService {
                 .message("Company and Admin user registered successfully.")
                 .companyId(company.getId())
                 .adminUserId(adminUser.getId())
+                .token(UUID.randomUUID().toString())
                 .build();
     }
 
@@ -87,7 +90,7 @@ public class AuthService {
                 .companyId(user.getCompanyId())
                 .role(user.getRole().name())
                 .name(user.getFullName())
-                .token("mock-jwt-token-" + System.currentTimeMillis())
+                .token(UUID.randomUUID().toString())
                 .build();
     }
 }

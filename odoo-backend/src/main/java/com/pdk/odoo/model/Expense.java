@@ -1,12 +1,6 @@
 package com.pdk.odoo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,26 +21,34 @@ public class Expense {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId; // FK → users.id
+    private Long companyId;
+    private Long userId;
+    private String employeeName;
+    private String employeeEmail;
+    private String autoApproveReason;
 
-    private BigDecimal amount; // Original amount (employee's currency)
-    private String currency; // Employee's chosen currency e.g. "USD"
+    @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("stepNumber ASC")
+    private java.util.List<ExpenseApprovalStep> approvalSteps;
 
-    private BigDecimal convertedAmount; // Converted to company base currency
-    private String companyCurrency; // Company's currency code e.g. "INR"
-    private BigDecimal exchangeRate; // Rate used at time of submission e.g. 94.77
+    private BigDecimal amount;
+    private String currency;
+
+    private BigDecimal convertedAmount;
+    private String companyCurrency;
+    private BigDecimal exchangeRate;
 
     private String category;
     private String description;
 
     @Temporal(TemporalType.DATE)
-    private Date date; // Expense date (user selected)
+    private Date date;
 
-    private String receiptPath; // "uploads/receipts/filename.pdf"
+    private String receiptPath;
 
-    private String status; // PENDING, APPROVED, REJECTED
+    private String status;
 
-    private Integer currentApprovalStep; // tracks active step in approval chain
+    private Integer currentApprovalStep;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;

@@ -1,12 +1,6 @@
 package com.pdk.odoo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,11 +20,11 @@ public class Company {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name; // "Acme Corp"
-    private String country; // "India"
-    private String currencyCode; // "INR"
-    private String currencyName; // "Indian Rupee"
-    private String currencySymbol; // "₹"
+    private String name;
+    private String country;
+    private String currencyCode;
+    private String currencyName;
+    private String currencySymbol;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;

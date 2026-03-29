@@ -1,16 +1,12 @@
 package com.pdk.odoo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 @Entity
 @Table(name = "users")
@@ -27,16 +23,19 @@ public class User {
     private String fullName;
     private String username;
     private String email;
-    private String password; // BCrypt hashed
+    private String password;
 
     @Enumerated(EnumType.STRING)
-    private Role role; // EMPLOYEE, MANAGER, ADMIN
+    private Role role;
 
     @Enumerated(EnumType.STRING)
-    private Designation designation; // FINANCE, DIRECTOR, CFO — null for EMPLOYEE/ADMIN
+    private Designation designation;
 
-    private Long managerId; // EMPLOYEE only → FK → users.id
-    private Boolean isManagerApprover; // EMPLOYEE only
+    private Long managerId;
+    private Boolean isManagerApprover;
 
-    private Long companyId; // FK → company.id
+    private Long companyId;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
 }

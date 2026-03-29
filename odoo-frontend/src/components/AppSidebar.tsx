@@ -65,7 +65,6 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
-        {/* Brand */}
         <div className="flex items-center gap-2 px-4 py-4 border-b border-sidebar-border">
           <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
             <DollarSign className="h-4 w-4 text-primary-foreground" />

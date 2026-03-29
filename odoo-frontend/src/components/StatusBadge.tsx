@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import type { ExpenseStatus } from "@/data/mockData";
+import type { ExpenseStatus } from "@/data/types";
 
 interface StatusBadgeProps {
   status: ExpenseStatus;
