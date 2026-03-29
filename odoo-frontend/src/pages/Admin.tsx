@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,24 +32,58 @@ const Admin = () => {
   const [newStepApproverId, setNewStepApproverId] = useState("");
   const { toast } = useToast();
 
-  const managers = users.filter((u) => u.role === "manager" || u.role === "admin");
+  const [managers, setManagers] = useState<{ id: string | number; name: string }[]>([]);
 
-  const handleCreate = () => {
+  useEffect(() => {
+    const companyId = localStorage.getItem("companyId");
+    if (companyId) {
+      fetch(`http://localhost:8081/api/admin/companies/${companyId}/managers`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (Array.isArray(data)) setManagers(data);
+        })
+        .catch(console.error);
+    }
+  }, []);
+
+  const handleCreate = async () => {
     if (!form.name || !form.email) {
       toast({ title: "Validation Error", description: "Name and email are required.", variant: "destructive" });
       return;
     }
-    const manager = managers.find((m) => m.id === form.managerId);
-    const newUser: UserRecord = {
-      id: `USR-${String(users.length + 1).padStart(3, "0")}`,
-      name: form.name, email: form.email, role: form.role,
-      managerId: form.managerId || undefined, managerName: manager?.name,
-      createdAt: new Date().toISOString().split("T")[0],
-    };
-    setUsers([...users, newUser]);
-    setForm({ name: "", email: "", role: "employee", managerId: "" });
-    setOpen(false);
-    toast({ title: "User Created", description: `${newUser.name} has been added as ${newUser.role}.` });
+    const companyId = localStorage.getItem("companyId");
+    if (!companyId) return toast({ title: "Error", description: "Company ID not found.", variant: "destructive" });
+
+    try {
+      const res = await fetch(`http://localhost:8081/api/admin/companies/${companyId}/users`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: form.name,
+          email: form.email,
+          role: form.role.toUpperCase(),
+          managerId: form.managerId || null,
+        }),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to create user");
+      }
+
+      const manager = managers.find((m) => m.id === form.managerId);
+      const newUser: UserRecord = {
+        id: `USR-${String(users.length + 1).padStart(3, "0")}`,
+        name: form.name, email: form.email, role: form.role,
+        managerId: form.managerId || undefined, managerName: manager?.name,
+        createdAt: new Date().toISOString().split("T")[0],
+      };
+      setUsers([...users, newUser]);
+      setForm({ name: "", email: "", role: "employee", managerId: "" });
+      setOpen(false);
+      toast({ title: "User Created", description: `${newUser.name} has been added as ${newUser.role}.` });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    }
   };
 
   const moveStep = (idx: number, dir: -1 | 1) => {
@@ -135,7 +169,7 @@ const Admin = () => {
                   <Select value={form.managerId} onValueChange={(v) => setForm({ ...form, managerId: v })}>
                     <SelectTrigger><SelectValue placeholder="Select manager" /></SelectTrigger>
                     <SelectContent>
-                      {managers.map((m) => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
+                      {managers.map((m) => <SelectItem key={m.id} value={String(m.id)}>{m.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
@@ -251,7 +285,7 @@ const Admin = () => {
                   <Select value={newStepApproverId} onValueChange={setNewStepApproverId}>
                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                     <SelectContent>
-                      {managers.map((m) => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
+                      {managers.map((m) => <SelectItem key={m.id} value={String(m.id)}>{m.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
@@ -319,7 +353,7 @@ const Admin = () => {
                   <Select value={ruleApproverId} onValueChange={setRuleApproverId}>
                     <SelectTrigger><SelectValue placeholder="Select approver" /></SelectTrigger>
                     <SelectContent>
-                      {managers.map((m) => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
+                      {managers.map((m) => <SelectItem key={m.id} value={String(m.id)}>{m.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>

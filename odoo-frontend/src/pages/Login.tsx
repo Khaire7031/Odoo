@@ -34,12 +34,27 @@ const Login = () => {
 
     setLoading(true);
     try {
-      await new Promise((r) => setTimeout(r, 800));
-      await AuthService.login({ email, password });
-      login(email, "demo-token-" + Date.now(), 123, demoRole, "Pranav");
+      const res = await fetch("http://localhost:8081/api/public/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: email,
+          password: password,
+          role: demoRole.toUpperCase(),
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Login failed");
+
+      if (data.companyId) {
+        localStorage.setItem("companyId", data.companyId);
+      }
+
+      login(email, data.token, data.userId, demoRole, data.name);
       navigate("/dashboard");
-    } catch {
-      setErrors({ general: "Login failed. Please try again." });
+    } catch (err: any) {
+      setErrors({ general: err.message || "Login failed. Please try again." });
     } finally {
       setLoading(false);
     }
