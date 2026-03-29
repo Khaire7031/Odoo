@@ -85,7 +85,7 @@ const Signup = () => {
     try {
       await new Promise((r) => setTimeout(r, 800));
       setCompanyInfo(company, selectedCountry, detectedCurrency);
-      login(email, "demo-token-" + Date.now(), "admin", name);
+      login(email, "demo-token-" + String(Date.now()), null, "admin", name);
       navigate("/dashboard");
     } catch {
       setErrors({ general: "Signup failed." });

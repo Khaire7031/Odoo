@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DollarSign } from "lucide-react";
+import AuthService from "@/services/AuthService";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -34,7 +35,8 @@ const Login = () => {
     setLoading(true);
     try {
       await new Promise((r) => setTimeout(r, 800));
-      login(email, "demo-token-" + Date.now(), demoRole);
+      await AuthService.login({ email, password });
+      login(email, "demo-token-" + Date.now(), 123, demoRole, "Pranav");
       navigate("/dashboard");
     } catch {
       setErrors({ general: "Login failed. Please try again." });

@@ -10,8 +10,10 @@ export interface ExpensePayload {
 }
 
 class ExpenseService {
-  async getAll() {
-    const { data } = await apiClient.get("/expenses");
+  async getAll(id: number) {
+
+    const { data } = await apiClient.get(`/expenses/${id}`);
+    console.log(data, "", id)
     return data;
   }
 

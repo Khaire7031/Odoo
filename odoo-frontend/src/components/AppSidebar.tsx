@@ -23,6 +23,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
+import { IconUser } from "@tabler/icons-react";
 
 interface NavItem {
   title: string;
@@ -99,7 +100,10 @@ export function AppSidebar() {
       <SidebarFooter className="border-t border-sidebar-border p-3">
         {!collapsed && user && (
           <div className="mb-2 px-1">
-            <p className="text-sm font-medium truncate">{user.name}</p>
+            <div className="d-flex">
+              <IconUser size={24} stroke={1.5} />
+              <p className="text-sm font-medium truncate">{user.name}</p>
+            </div>
             <p className="text-xs text-muted-foreground truncate">{user.email}</p>
             <Badge variant={roleBadgeVariant(user.role)} className="mt-1 text-[10px] capitalize">
               {user.role}
