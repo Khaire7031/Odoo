@@ -8,6 +8,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CompanyConfigDto {
+    private String companyName;
+    private String country;
     private String baseCurrency;
     private ApprovalRuleDto approvalRule;
     private List<ApprovalSequenceStepDto> approvalSequence;
