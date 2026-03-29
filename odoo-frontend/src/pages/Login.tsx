@@ -69,7 +69,7 @@ const Login = () => {
             {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
           </div>
           <div className="space-y-2">
-            <Label>Demo Role</Label>
+            <Label>User Role</Label>
             <Select value={demoRole} onValueChange={(v) => setDemoRole(v as UserRole)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>

@@ -113,11 +113,11 @@ const Admin = () => {
             <div className="space-y-4 mt-2">
               <div className="space-y-2">
                 <Label>Full Name *</Label>
-                <Input placeholder="John Doe" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                <Input placeholder="User Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
               </div>
               <div className="space-y-2">
                 <Label>Email *</Label>
-                <Input type="email" placeholder="john@company.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                <Input type="email" placeholder="user@reimburseme.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
               </div>
               <div className="space-y-2">
                 <Label>Role</Label>
@@ -126,7 +126,6 @@ const Admin = () => {
                   <SelectContent>
                     <SelectItem value="employee">Employee</SelectItem>
                     <SelectItem value="manager">Manager</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
