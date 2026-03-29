@@ -30,29 +30,21 @@ const Signup = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("https://restcountries.com/v3.1/all?fields=name,currencies")
+    fetch("http://localhost:8081/api/public/countries")
       .then((r) => r.json())
       .then((data: any[]) => {
         const parsed: CountryOption[] = data
-          .filter((c: any) => c.currencies && Object.keys(c.currencies).length > 0)
-          .map((c: any) => {
-            const code = Object.keys(c.currencies)[0];
-            return {
-              name: c.name.common,
-              currencyCode: code,
-              currencyName: c.currencies[code].name,
-            };
-          })
-          .sort((a: CountryOption, b: CountryOption) => a.name.localeCompare(b.name));
+          .map((c: any) => ({
+            name: c.name,
+            currencyCode: c.currencyCode,
+            currencyName: c.currencyName,
+          }))
+          .sort((a, b) => a.name.localeCompare(b.name));
         setCountries(parsed);
       })
-      .catch(() => {
-        setCountries([
-          { name: "United States", currencyCode: "USD", currencyName: "US Dollar" },
-          { name: "India", currencyCode: "INR", currencyName: "Indian Rupee" },
-          { name: "United Kingdom", currencyCode: "GBP", currencyName: "Pound Sterling" },
-          { name: "Australia", currencyCode: "AUD", currencyName: "Australian Dollar" },
-        ]);
+      .catch((err) => {
+        console.error("Failed to fetch countries", err);
+        setCountries([]);
       })
       .finally(() => setLoadingCountries(false));
   }, []);
@@ -83,12 +75,20 @@ const Signup = () => {
 
     setLoading(true);
     try {
-      await new Promise((r) => setTimeout(r, 800));
+      const res = await fetch("http://localhost:8081/api/public/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fullName: name, companyName: company, countryName: selectedCountry, email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Signup failed");
+
       setCompanyInfo(company, selectedCountry, detectedCurrency);
-      login(email, "demo-token-" + String(Date.now()), null, "admin", name);
+      localStorage.setItem("companyId", data.companyId); // Save globally accessible metadata
+      login(email, "demo-token-" + String(Date.now()), data.adminUserId, "admin", name);
       navigate("/dashboard");
-    } catch {
-      setErrors({ general: "Signup failed." });
+    } catch (err: any) {
+      setErrors({ general: err.message || "Signup failed." });
     } finally {
       setLoading(false);
     }
