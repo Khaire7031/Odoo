@@ -50,7 +50,10 @@ const Login = () => {
       if (data.companyId) {
         localStorage.setItem("companyId", data.companyId);
       }
-
+      await AuthService.login({
+        email: email,
+        password: password,
+      });
       login(email, data.token, data.userId, demoRole, data.name);
       navigate("/dashboard");
     } catch (err: any) {

@@ -16,7 +16,7 @@ export interface LoginResponse {
 
 class AuthService {
   async login(payload: LoginPayload): Promise<LoginResponse> {
-    const { data } = await apiClient.post<LoginResponse>("/auth/login", payload);
+    const { data } = await apiClient.post<LoginResponse>("/auth/signup", payload);
     console.log("Login Data : ", data);
     const token = localStorage.setItem("auth_token", data.token);
     const email = localStorage.setItem("auth_email", data.user.email);
