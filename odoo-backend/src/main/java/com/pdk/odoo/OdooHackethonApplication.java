@@ -8,6 +8,9 @@ public class OdooHackethonApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(OdooHackethonApplication.class, args);
+		System.out.println("-------------------------------------");
+		System.out.println("Odoo Hackethon Application Started!");
+		System.out.println("-------------------------------------");
 	}
 
 }
